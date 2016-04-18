@@ -1,0 +1,24 @@
+#grid dimension
+iDim            5
+jDim            5
+xmin            0
+xmax            10
+ymin            0
+ymax            10
+#nozzle setup
+jetRadius	0.5
+jetRe		500.0
+jetTemp		400.0
+#gas thermo-properties (dry air)
+#gas constant unit: J/(kg.K)
+#mu: gas dynamic viscosity in SI unit
+gamma		1.4
+gasConst	287.058
+#initial condition
+Uinit		0.0
+Vinit		0.0
+Pinit		101325.0
+Tinit		300.0
+#simulation setup
+maxIter         1
+Courant         0.5
