@@ -52,8 +52,28 @@ def updateQvector(imax,jmax):
 
    f = centralFiniteDifference(-FDM.Fi[0], 'x')
 
-#   for n in range(4):
-#      FDM.Q[n] = 
+   for n in range(4):
+      FDM.Q[n] = np.zeros((imax,jmax))
+      FDM.Q[n] += centralFiniteDifference(-FDM.Fi[0], 'x')
+      FDM.Q[n] += centralFiniteDifference(-FDM.Gi[0], 'y')
+
+def updateStateVector(dt):
+   for n in range(4):
+      FDM.phi[n] += dt * FDM.Q[n]
+
+def updatePrimitiveVariables(inputDict,imax,jmax):
+   Rgas  = float(inputDict['gasConst'])
+   gamma = float(inputDict['gamma'])
+
+   # update only interior points
+   flowVars.rho = FDM.phi[0]
+   flowVars.U   = FDM.phi[1] / flowVars.rho
+   flowVars.V   = FDM.phi[2] / flowVars.rho
+   flowVars.et  = FDM.phi[3] / flowVars.rho
+   # internal energy
+   ei = flowVars.et - 0.5 * (flowVars.U ** 2 - flowVars.V ** 2)
+   flowVars.P   = (gamma - 1.0) * flowVars.rho * ei
+   flowVars.T   = flowVars.P / flowVars.rho / Rgas
 
 
 def centralFiniteDifference(phi, direction):
@@ -65,7 +85,12 @@ def centralFiniteDifference(phi, direction):
 
    # x-derivative
    if direction == 'x':
-      f = phi[
+      f[1:imax-1,1:jmax-1] = 0.5 * (phi[2:imax,1:jmax-1] - phi[0:imax-2,1:jmax-1]) / dx 
+
+   elif direction == 'y':
+      f[1:imax-1,1:jmax-1] = 0.5 * (phi[1:imax-1,2:jmax] - phi[1:imax-1,0:jmax-2]) / dy
+
+      
 
    return f
 

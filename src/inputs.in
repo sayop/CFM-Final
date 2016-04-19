@@ -8,7 +8,7 @@ ymax            10
 #nozzle setup
 jetRadius	0.5
 jetRe		500.0
-jetTemp		400.0
+jetTemp		300.0
 #gas thermo-properties (dry air)
 #gas constant unit: J/(kg.K)
 #mu: gas dynamic viscosity in SI unit
@@ -22,7 +22,7 @@ Tinit		300.0
 #simulation setup
 # if iVisc is 1, full Navier-Stokes equation.
 # if iVisc is 0, Euler equation.
-maxIter         1
+maxIter         30
 nIterWrite	100
 iVisc		1
 Courant         0.5

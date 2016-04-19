@@ -33,6 +33,12 @@ def timeIntegrate(inputDict):
       # update Q vector: Q vector contains finite differenced state vectors to update state vector in time
       updateQvector(imax,jmax)
 
+      # update state vector from Q vector
+      updateStateVector(dt)
+
+      # compute primitive variables from state vector elements
+      updatePrimitiveVariables(inputDict,imax,jmax)
+
       t += dt
       print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt
 

@@ -15,33 +15,37 @@ def initSimulationVars(inputDict):
    Rgas  = float(inputDict['gasConst'])
    gamma = float(inputDict['gamma'])
 
-   RHOinit = Pinit / (Rgas * Tinit)
-
-   flowVars.rho  = RHOinit * np.ones((imax,jmax))
-   flowVars.P    = Pinit * np.ones((imax,jmax))
-   flowVars.T    = Tinit * np.ones((imax,jmax))
-   flowVars.U    = Uinit * np.ones((imax,jmax))
-   flowVars.V    = Vinit * np.ones((imax,jmax))
-   # energy per unit mass
-   flowVars.et   = flowVars.P / (gamma - 1.0) / flowVars.rho + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
-
    # Reference parameters defined at jet exit
-   muRef, kRef = sutherland(Tinit)
+   jetTemp = float(inputDict['jetTemp'])
+   muRef, kRef = sutherland(jetTemp)
    print '# Reference gas viscosity = ', muRef
    print '# Reference gas thermal conductivity = ', kRef
 
    jetRe = float(inputDict['jetRe'])
    flowVars.jetRe = jetRe
    Dref  = 2.0 * float(inputDict['jetRadius'])
-   Ujet  = muRef * jetRe / (RHOinit * Dref)
+   RHOjet = Pinit / (Rgas * jetTemp)
+   Ujet  = muRef * jetRe / (RHOjet * Dref)
    flowVars.Ujet = Ujet
 
    print '# Gas jet velocity = ', Ujet
    print '# Jet diameter = ', Dref
    print '# Jet Reynolds no = ', jetRe
 
-   # Populate boundary values that is specified by user in inputs.in
-   updateVelocityBC(imax,jmax)
 
-   # update jet nozzle inlet BC
-   updateNozzleInletBC(inputDict,imax,jmax,Ujet)
+   flowVars.P    = Pinit * np.ones((imax,jmax))
+   flowVars.T    = Tinit * np.ones((imax,jmax))
+   flowVars.U    = Uinit * np.ones((imax,jmax))
+   flowVars.V    = Vinit * np.ones((imax,jmax))
+   # Populate boundary values that is specified by user in inputs.in
+   #updateVelocityBC(imax,jmax)
+   # update jet nozzle inlet BC: jet velocity and temperature
+   updateNozzleInletBC(inputDict,imax,jmax,Ujet,jetTemp)
+
+   flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
+
+   # energy per unit mass
+   # ei: internal energy per unit mass
+   ei = flowVars.P / flowVars.rho / (gamma - 1.0)
+   flowVars.et   = ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
+

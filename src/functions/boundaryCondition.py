@@ -13,7 +13,9 @@ def updateVelocityBC(imax,jmax):
    flowVars.U[:,jmax-1] = 0.0
    flowVars.V[:,jmax-1] = 0.0
 
-def updateNozzleInletBC(inputDict,imax,jmax,Ujet):
+
+
+def updateNozzleInletBC(inputDict,imax,jmax,Ujet,jetTemp):
    jetRadius = float(inputDict['jetRadius'])
    ymin = float(inputDict['ymin'])
    ymax = float(inputDict['ymax'])
@@ -21,7 +23,6 @@ def updateNozzleInletBC(inputDict,imax,jmax,Ujet):
    yminNoz = yNozOrig - jetRadius
    ymaxNoz = yNozOrig + jetRadius
 
-   jetTemp = float(inputDict['jetTemp'])
 
    for j in range(jmax):
       if (domainVars.y[j] >= yminNoz) and (domainVars.y[j] <= ymaxNoz):
