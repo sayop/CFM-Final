@@ -15,12 +15,14 @@ class flowVars:
    U   = []
    V   = []
    T   = []
-   Et  = []
+   et  = []
 
 
 class FDM:
-   Fi  = [] * 4
-   Gi  = [] * 4
-   Fv  = [] * 4
-   Gv  = [] * 4
+   Q   = [None] * 4
+   phi = [None] * 4
+   Fi  = [None] * 4
+   Gi  = [None] * 4
+   Fv  = [None] * 4
+   Gv  = [None] * 4
    

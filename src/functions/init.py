@@ -13,6 +13,7 @@ def initSimulationVars(inputDict):
    Uinit = float(inputDict['Uinit'])
    Vinit = float(inputDict['Vinit'])
    Rgas  = float(inputDict['gasConst'])
+   gamma = float(inputDict['gamma'])
 
    RHOinit = Pinit / (Rgas * Tinit)
 
@@ -21,6 +22,8 @@ def initSimulationVars(inputDict):
    flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
+   # energy per unit mass
+   flowVars.et   = flowVars.P / (gamma - 1.0) / flowVars.rho + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
 
    # Reference parameters defined at jet exit
    muRef, kRef = sutherland(Tinit)
@@ -38,6 +41,7 @@ def initSimulationVars(inputDict):
    print '# Jet Reynolds no = ', jetRe
 
    # Populate boundary values that is specified by user in inputs.in
-   updateDirichletBC(inputDict,imax,jmax,Ujet)
+   updateVelocityBC(imax,jmax)
 
-
+   # update jet nozzle inlet BC
+   updateNozzleInletBC(inputDict,imax,jmax,Ujet)
