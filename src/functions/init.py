@@ -37,8 +37,6 @@ def initSimulationVars(inputDict):
    flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
-   # Populate boundary values that is specified by user in inputs.in
-   #updateVelocityBC(imax,jmax)
    # update jet nozzle inlet BC: jet velocity and temperature
    updateNozzleInletBC(inputDict,imax,jmax,Ujet,jetTemp)
 

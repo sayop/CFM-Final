@@ -1,17 +1,48 @@
 import numpy as np
 from variables import *
 
-def updateVelocityBC(imax,jmax):
-   # update boundary values of u and v in dimensionalized form
-   # Left boundary
-   flowVars.U[0,:] = 0.0
-   flowVars.V[0,:] = 0.0
-   # Bottom boundary (No-slip)
-   flowVars.U[:,0] = 0.0
-   flowVars.V[:,0] = 0.0
-   # Upper boundary (No-slip)
-   flowVars.U[:,jmax-1] = 0.0
-   flowVars.V[:,jmax-1] = 0.0
+def updateBC(imax,jmax):
+   # Left boundary: adiabatic, no-slip wall
+   # Do NOT update on velocity fields
+   # pressure gradient zero normal to the wall
+   #flowVars.U[0,:] = 0.0
+   #flowVars.V[0,:] = 0.0
+   flowVars.rho[0,:] = flowVars.rho[1,:]
+   flowVars.P[0,:]   = flowVars.P[1,:]
+   flowVars.T[0,:]   = flowVars.T[1,:]
+   flowVars.et[0,:]  = flowVars.et[1,:]
+   
+  
+   # Right boundary: outflow boundary
+   flowVars.rho[imax-1,0:jmax] = flowVars.rho[imax-2,0:jmax]
+   flowVars.U[imax-1,0:jmax]   = flowVars.U[imax-2,0:jmax]
+   flowVars.V[imax-1,0:jmax]   = flowVars.V[imax-2,0:jmax]
+   flowVars.P[imax-1,0:jmax]   = flowVars.P[imax-2,0:jmax]
+   flowVars.T[imax-1,0:jmax]   = flowVars.T[imax-2,0:jmax]
+   flowVars.et[imax-1,0:jmax]  = flowVars.et[imax-2,0:jmax]
+
+
+   # Bottom boundary: adiabatic, no-slip wall
+   # Do NOT update on velocity fields
+   # pressure gradient zero normal to the wall
+   #flowVars.U[0,:] = 0.0
+   #flowVars.V[0,:] = 0.0
+   flowVars.rho[:,0] = flowVars.rho[:,1]
+   flowVars.P[:,0]   = flowVars.P[:,1]
+   flowVars.T[:,0]   = flowVars.T[:,1]
+   flowVars.et[:,0]  = flowVars.et[:,1]
+
+
+   # Upper boundary: adiabatic, no-slip wall
+   # Do NOT update on velocity fields
+   # pressure gradient zero normal to the wall
+   #flowVars.U[0,:] = 0.0
+   #flowVars.V[0,:] = 0.0
+   flowVars.rho[:,jmax-1] = flowVars.rho[:,jmax-2]
+   flowVars.P[:,jmax-1]   = flowVars.P[:,jmax-2]
+   flowVars.T[:,jmax-1]   = flowVars.T[:,jmax-2]
+   flowVars.et[:,jmax-1]  = flowVars.et[:,jmax-2]
+
 
 
 

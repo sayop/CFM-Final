@@ -1,5 +1,7 @@
 import numpy as np
 from solutionMethod import *
+from boundaryCondition import *
+from post import *
 
 import time
 
@@ -36,11 +38,18 @@ def timeIntegrate(inputDict):
       # update state vector from Q vector
       updateStateVector(dt)
 
-      # compute primitive variables from state vector elements
+      # compute primitive variables from state vector elements: update only interior points
       updatePrimitiveVariables(inputDict,imax,jmax)
 
+      # update boundary condition
+      updateBC(imax,jmax)
+
+      
       t += dt
-      print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt
+      print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt, ", Tmax = %.5e" % flowVars.T.max(), ", Tmin = %.5e" % flowVars.T.min(), ", Pmax = %.5e" % flowVars.P.max()
+
+      if (nIter % nIterWrite == 0):
+         plotContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
 
       #if (nIter >= maxIter or resNorm <= residualMin): break
       if (nIter >= maxIter): break
