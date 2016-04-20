@@ -25,12 +25,15 @@ def timeIntegrate(inputDict):
    t = tStart
    nIter = 0
    while True:
+      # plot initial condition
+      if nIter == 0: plotContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
+
       nIter += 1
       # Find time step that may stabilize the solution with given Courant number
       dt = computeTimeStep(inputDict,imax,jmax)
 
       # update flux vector for inviscid and viscid terms
-      updateFluxVectors(iVisc)
+      updateFluxVectors(imax,jmax,iVisc)
       
       # update Q vector: Q vector contains finite differenced state vectors to update state vector in time
       updateQvector(imax,jmax)
@@ -42,7 +45,7 @@ def timeIntegrate(inputDict):
       updatePrimitiveVariables(inputDict,imax,jmax)
 
       # update boundary condition
-      updateBC(imax,jmax)
+      updateBC(inputDict,imax,jmax)
 
       
       t += dt

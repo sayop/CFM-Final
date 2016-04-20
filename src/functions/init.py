@@ -17,6 +17,7 @@ def initSimulationVars(inputDict):
 
    # Reference parameters defined at jet exit
    jetTemp = float(inputDict['jetTemp'])
+   flowVars.jetTemp = jetTemp
    muRef, kRef = sutherland(jetTemp)
    print '# Reference gas viscosity = ', muRef
    print '# Reference gas thermal conductivity = ', kRef
@@ -37,8 +38,6 @@ def initSimulationVars(inputDict):
    flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
-   # update jet nozzle inlet BC: jet velocity and temperature
-   updateNozzleInletBC(inputDict,imax,jmax,Ujet,jetTemp)
 
    flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
 
@@ -47,3 +46,4 @@ def initSimulationVars(inputDict):
    ei = flowVars.P / flowVars.rho / (gamma - 1.0)
    flowVars.et   = ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
 
+   updateBC(inputDict,imax,jmax)

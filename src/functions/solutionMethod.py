@@ -28,7 +28,7 @@ def computeSpeedOfSound(temp,gamma,Rgas):
    return a
 
 
-def updateFluxVectors(iVisc):
+def updateFluxVectors(imax,jmax,iVisc):
 
    #State vector
    FDM.phi[0] = flowVars.rho
@@ -47,6 +47,76 @@ def updateFluxVectors(iVisc):
    FDM.Gi[1] = flowVars.rho * flowVars.V * flowVars.U
    FDM.Gi[2] = flowVars.rho * flowVars.V * flowVars.V + flowVars.P
    FDM.Gi[3] = flowVars.rho * flowVars.V * flowVars.et
+
+   # update diffusive flux
+   if iVisc == 1:
+      Tau, Qj = computeDiffusiveTransport(imax,jmax)
+
+      FDM.Fv[0] = np.zeros((imax,jmax))
+      FDM.Fv[1] = Tau[:,:,0,0]
+      FDM.Fv[2] = Tau[:,:,0,1]
+      FDM.Fv[3] = -Qj[:,:,0] + flowVars.U * Tau[:,:,0,0] + flowVars.V * Tau[:,:,0,1]
+
+      FDM.Gv[0] = np.zeros((imax,jmax))
+      FDM.Gv[1] = Tau[:,:,1,0]
+      FDM.Gv[2] = Tau[:,:,1,1]
+      FDM.Gv[3] = -Qj[:,:,1] + flowVars.U * Tau[:,:,1,0] + flowVars.V * Tau[:,:,1,1]
+
+      # Add up the diffusive fluxes to total flux
+      FDM.Fi[0] = FDM.Fi[0] - FDM.Fv[0]
+      FDM.Fi[1] = FDM.Fi[1] - FDM.Fv[1]
+      FDM.Fi[2] = FDM.Fi[2] - FDM.Fv[2]
+      FDM.Fi[3] = FDM.Fi[3] - FDM.Fv[3]
+
+      FDM.Gi[0] = FDM.Gi[0] - FDM.Gv[0]
+      FDM.Gi[1] = FDM.Gi[1] - FDM.Gv[1]
+      FDM.Gi[2] = FDM.Gi[2] - FDM.Gv[2]
+      FDM.Gi[3] = FDM.Gi[3] - FDM.Gv[3]
+
+def computeDiffusiveTransport(imax,jmax):
+   from transport import sutherland
+   # gas transport properties
+   mu, k = sutherland(flowVars.T)
+   # UiXj: Xj derivative of Ui
+   UiXj = np.zeros((imax,jmax,2,2))
+
+   for i in range(2):
+      if i == 0: Ui = flowVars.U
+      if i == 1: Ui = flowVars.V
+      for j in range(2):
+         if j == 0: direction = 'x'
+         if j == 1: direction = 'y'
+         UiXj[:,:,i,j] = centralFiniteDifference(Ui, direction)
+
+   # UiXi: divergence of velocity vector
+   # UiXi = dUdX + dVdY
+   UiXi = np.zeros((imax,jmax))
+   for j in range(jmax):
+      for i in range(imax):
+         UiXi[i,j] = UiXj[i,j,0,0] + UiXj[i,j,1,1]
+
+   # evaluate viscous stress tensor
+   Tau = np.zeros((imax,jmax,2,2))
+   for i in range(2):
+      for j in range(2):
+         # Kronecker delta function
+         if i == j:
+            kDelta = 1.0
+         else:
+            kDelta = 0.0
+         # Bulk viscosity coefficient: Lambda = -2/3 * mu
+         Lambda = -2.0 / 3.0 * mu[i,j]
+         Tau[:,:,i,j] = mu[i,j] * (UiXj[:,:,i,j] + UiXj[:,:,j,i]) + kDelta * Lambda * UiXi
+
+
+   # evaluate heat flux
+   Qj = np.zeros((imax,jmax,2))
+   for j in range(2):
+      if j == 0: direction = 'x'
+      if j == 1: direction = 'y'
+      Qj[:,:,j] = k * centralFiniteDifference(-flowVars.T, direction)
+
+   return Tau, Qj
 
 def updateQvector(imax,jmax):
 

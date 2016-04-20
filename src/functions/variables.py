@@ -9,6 +9,7 @@ class domainVars:
 
 class flowVars:
    Ujet = 0.0
+   jetTemp = 0.0
    jetRe = 0.0     # Reynolds number
    rho = []
    P   = []

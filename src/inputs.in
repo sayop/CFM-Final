@@ -15,14 +15,14 @@ jetTemp		300.0
 gamma		1.4
 gasConst	287.058
 #initial condition
-Uinit		0.0
+Uinit		0.1
 Vinit		0.0
 Pinit		101325.0
 Tinit		300.0
 #simulation setup
 # if iVisc is 1, full Navier-Stokes equation.
 # if iVisc is 0, Euler equation.
-maxIter         10000000
-nIterWrite	100000
+maxIter         200000
+nIterWrite	5000
 iVisc		1
-Courant         0.0005
+Courant         0.1
