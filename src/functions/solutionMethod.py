@@ -6,11 +6,15 @@ def computeTimeStep(inputDict,imax,jmax):
    Cr      = float(inputDict['Courant'])
    gamma   = float(inputDict['gamma'])
    Rgas    = float(inputDict['gasConst'])
+   beta    = float(inputDict['beta'])
    dx = domainVars.dx
    dy = domainVars.dy
 
    # calculate speed of sound
-   a = computeSpeedOfSound(flowVars.T,gamma,Rgas)
+   if beta > 0.0:
+      a = 1.0 / np.sqrt(beta)
+   else:
+      a = computeSpeedOfSound(flowVars.T,gamma,Rgas)
 
    Uconv = abs(flowVars.U) + a
    Vconv = abs(flowVars.V) + a
@@ -27,30 +31,45 @@ def computeSpeedOfSound(temp,gamma,Rgas):
 
    return a
 
-
-def updateFluxVectors(imax,jmax,iVisc):
-
+def populateStateVector(inputDict,imax,jmax):
+   Rgas  = float(inputDict['gasConst'])
+   gamma = float(inputDict['gamma'])
+   beta  = float(inputDict['beta'])
+   # transform primative variables to elements of state vector
    #State vector
-   FDM.phi[0] = flowVars.rho
+   # each elements are only effective in interior node points
+   if beta == 0: 
+      FDM.phi[0] = flowVars.rho
+   elif beta > 0.0:
+      FDM.phi[0] = flowVars.P
    FDM.phi[1] = flowVars.rho * flowVars.U
    FDM.phi[2] = flowVars.rho * flowVars.V
    FDM.phi[3] = flowVars.rho * flowVars.et
 
+
+def updateFluxVectors(imax,jmax,iVisc,beta):
    # flux vector in x-direction
    FDM.Fi[0] = flowVars.rho * flowVars.U
    FDM.Fi[1] = flowVars.rho * flowVars.U * flowVars.U + flowVars.P
    FDM.Fi[2] = flowVars.rho * flowVars.U * flowVars.V
    FDM.Fi[3] = flowVars.rho * flowVars.U * flowVars.et
+   if beta > 0.0:
+      FDM.Fi[0] = FDM.Fi[0] / beta
 
    # flux vector in y-direction
    FDM.Gi[0] = flowVars.rho * flowVars.V
    FDM.Gi[1] = flowVars.rho * flowVars.V * flowVars.U
    FDM.Gi[2] = flowVars.rho * flowVars.V * flowVars.V + flowVars.P
    FDM.Gi[3] = flowVars.rho * flowVars.V * flowVars.et
+   if beta > 0.0:
+      FDM.Gi[0] = FDM.Gi[0] / beta
 
    # update diffusive flux
    if iVisc == 1:
       Tau, Qj = computeDiffusiveTransport(imax,jmax)
+      if beta > 0.0:
+         Tau = Tau / flowVars.rhoRef
+         Qj  = Qj  / flowVars.rhoRef
 
       FDM.Fv[0] = np.zeros((imax,jmax))
       FDM.Fv[1] = Tau[:,:,0,0]
@@ -124,26 +143,33 @@ def updateQvector(imax,jmax):
 
    for n in range(4):
       FDM.Q[n] = np.zeros((imax,jmax))
-      FDM.Q[n] += centralFiniteDifference(-FDM.Fi[0], 'x')
-      FDM.Q[n] += centralFiniteDifference(-FDM.Gi[0], 'y')
+      FDM.Q[n] += centralFiniteDifference(-FDM.Fi[n], 'x')
+      FDM.Q[n] += centralFiniteDifference(-FDM.Gi[n], 'y')
 
-def updateStateVector(dt):
+def integrateStateVector(dt):
    for n in range(4):
       FDM.phi[n] += dt * FDM.Q[n]
 
 def updatePrimitiveVariables(inputDict,imax,jmax):
    Rgas  = float(inputDict['gasConst'])
    gamma = float(inputDict['gamma'])
+   beta  = float(inputDict['beta'])
+   # Cv: constant volume specific heat
+   Cv    = Rgas / (gamma - 1.0)
 
    # update only interior points
-   flowVars.rho = FDM.phi[0]
    flowVars.U   = FDM.phi[1] / flowVars.rho
    flowVars.V   = FDM.phi[2] / flowVars.rho
    flowVars.et  = FDM.phi[3] / flowVars.rho
    # internal energy
-   ei = flowVars.et - 0.5 * (flowVars.U ** 2 - flowVars.V ** 2)
-   flowVars.P   = (gamma - 1.0) * flowVars.rho * ei
-   flowVars.T   = flowVars.P / flowVars.rho / Rgas
+   flowVars.ei = flowVars.et - 0.5 * (flowVars.U ** 2 - flowVars.V ** 2)
+   flowVars.T   = flowVars.ei / Cv
+   if beta > 0.0:
+      flowVars.P = FDM.phi[0]
+   else:
+      flowVars.rho = FDM.phi[0]
+      flowVars.P   = (gamma - 1.0) * flowVars.rho * flowVars.ei
+   #flowVars.T   = flowVars.P / flowVars.rho / Rgas
 
 
 def centralFiniteDifference(phi, direction):

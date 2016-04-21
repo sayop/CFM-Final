@@ -11,12 +11,14 @@ class flowVars:
    Ujet = 0.0
    jetTemp = 0.0
    jetRe = 0.0     # Reynolds number
+   rhoRef = 0.0
    rho = []
    P   = []
    U   = []
    V   = []
    T   = []
    et  = []
+   ei  = []
 
 
 class FDM:

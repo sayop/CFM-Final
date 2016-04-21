@@ -1,28 +1,33 @@
 #grid dimension
-iDim            20
-jDim            20
+iDim            5
+jDim            5
 xmin            0
 xmax            0.05
 ymin            0
 ymax            0.05
 #nozzle setup
 jetRadius	0.005
-jetRe		100.0
-jetTemp		300.0
+jetRe		50.0
+jetTemp		400.0
+# pressure boundary for inflow/outflow
+Pinflow		101325.0
+Poutflow	101000.0
 #gas thermo-properties (dry air)
 #gas constant unit: J/(kg.K)
 #mu: gas dynamic viscosity in SI unit
 gamma		1.4
 gasConst	287.058
 #initial condition
-Uinit		0.1
+Uinit		0.0
 Vinit		0.0
 Pinit		101325.0
 Tinit		300.0
 #simulation setup
 # if iVisc is 1, full Navier-Stokes equation.
 # if iVisc is 0, Euler equation.
-maxIter         200000
-nIterWrite	5000
+maxIter         4
+nIterWrite	500
 iVisc		1
 Courant         0.1
+# if beta > 0.0, ACM is used
+beta		0.0

@@ -2,6 +2,7 @@ import numpy as np
 from variables import *
 from transport import sutherland
 from boundaryCondition import *
+from solutionMethod import *
 
 def initSimulationVars(inputDict):
    print '# Initializing flow variables...'
@@ -14,6 +15,11 @@ def initSimulationVars(inputDict):
    Vinit = float(inputDict['Vinit'])
    Rgas  = float(inputDict['gasConst'])
    gamma = float(inputDict['gamma'])
+   # For Artificial Compressibility Method
+   beta  = float(inputDict['beta'])
+   
+   # Cv: constant volume specific heat
+   Cv    = Rgas / (gamma - 1.0)
 
    # Reference parameters defined at jet exit
    jetTemp = float(inputDict['jetTemp'])
@@ -38,12 +44,21 @@ def initSimulationVars(inputDict):
    flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
+   # For ACM, convert dynamic pressure into kinematic pressure
+   if beta > 0.0:
+      # Since ACM is for incompressible solution, rhoRef is used for constant density.
+      flowVars.rhoRef = Pinit / (Rgas * Tinit)
+      flowVars.P = flowVars.P / flowVars.rhoRef
+      flowVars.rho  = np.ones((imax,jmax))
+   else:
+      flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
 
-   flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
-
-   # energy per unit mass
-   # ei: internal energy per unit mass
-   ei = flowVars.P / flowVars.rho / (gamma - 1.0)
-   flowVars.et   = ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
+   # compute energy per unit mass from EOS relation
+   flowVars.ei   = Cv * flowVars.T
+   flowVars.et   = flowVars.ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
 
    updateBC(inputDict,imax,jmax)
+
+   # state vector is populated with given initial condition at very first beginning.
+   # Then, state vector will updated during the time integration process only.
+   populateStateVector(inputDict,imax,jmax)

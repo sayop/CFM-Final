@@ -12,6 +12,7 @@ def timeIntegrate(inputDict):
    maxIter = int(inputDict['maxIter'])
    nIterWrite  = int(inputDict['nIterWrite'])
    iVisc   = int(inputDict['iVisc'])
+   beta    = float(inputDict['beta'])
 
    # start to count time for calculting computation performance
    start = time.clock()
@@ -33,26 +34,28 @@ def timeIntegrate(inputDict):
       dt = computeTimeStep(inputDict,imax,jmax)
 
       # update flux vector for inviscid and viscid terms
-      updateFluxVectors(imax,jmax,iVisc)
-      
+      updateFluxVectors(imax,jmax,iVisc,beta)
+
       # update Q vector: Q vector contains finite differenced state vectors to update state vector in time
       updateQvector(imax,jmax)
 
       # update state vector from Q vector
-      updateStateVector(dt)
+      integrateStateVector(dt)
 
+      print flowVars.P
       # compute primitive variables from state vector elements: update only interior points
       updatePrimitiveVariables(inputDict,imax,jmax)
 
       # update boundary condition
       updateBC(inputDict,imax,jmax)
-
       
       t += dt
       print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt, ", Tmax = %.5e" % flowVars.T.max(), ", Tmin = %.5e" % flowVars.T.min(), ", Pmax = %.5e" % flowVars.P.max()
 
       if (nIter % nIterWrite == 0):
+         plotStreamLine(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
          plotContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
+         #plotTempContour(domainVars.x, domainVars.y, flowVars.T, nIter)
 
       #if (nIter >= maxIter or resNorm <= residualMin): break
       if (nIter >= maxIter): break
