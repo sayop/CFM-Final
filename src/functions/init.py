@@ -47,9 +47,9 @@ def initSimulationVars(inputDict):
    # For ACM, convert dynamic pressure into kinematic pressure
    if beta > 0.0:
       # Since ACM is for incompressible solution, rhoRef is used for constant density.
+      # ACM does NOT update density. INCOMPRESSIBLE solution.
       flowVars.rhoRef = Pinit / (Rgas * Tinit)
       flowVars.P = flowVars.P / flowVars.rhoRef
-      flowVars.rho  = np.ones((imax,jmax))
    else:
       flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
 

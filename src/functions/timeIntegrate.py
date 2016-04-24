@@ -12,7 +12,6 @@ def timeIntegrate(inputDict):
    maxIter = int(inputDict['maxIter'])
    nIterWrite  = int(inputDict['nIterWrite'])
    iVisc   = int(inputDict['iVisc'])
-   beta    = float(inputDict['beta'])
 
    # start to count time for calculting computation performance
    start = time.clock()
@@ -27,22 +26,21 @@ def timeIntegrate(inputDict):
    nIter = 0
    while True:
       # plot initial condition
-      if nIter == 0: plotContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
+      if nIter == 0: plotUmagContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
 
       nIter += 1
       # Find time step that may stabilize the solution with given Courant number
       dt = computeTimeStep(inputDict,imax,jmax)
 
       # update flux vector for inviscid and viscid terms
-      updateFluxVectors(imax,jmax,iVisc,beta)
+      updateFluxVectors(inputDict,imax,jmax,iVisc)
 
       # update Q vector: Q vector contains finite differenced state vectors to update state vector in time
-      updateQvector(imax,jmax)
+      updateQvector(imax,jmax,iVisc)
 
       # update state vector from Q vector
       integrateStateVector(dt)
 
-      print flowVars.P
       # compute primitive variables from state vector elements: update only interior points
       updatePrimitiveVariables(inputDict,imax,jmax)
 
@@ -50,11 +48,13 @@ def timeIntegrate(inputDict):
       updateBC(inputDict,imax,jmax)
       
       t += dt
-      print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt, ", Tmax = %.5e" % flowVars.T.max(), ", Tmin = %.5e" % flowVars.T.min(), ", Pmax = %.5e" % flowVars.P.max()
+      print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt, ", Tmax = %.5e" % flowVars.T.max(), ", Tmin = %.5e" % flowVars.T.min(), ", Pmax = %.5e" % flowVars.P.max(), ", Umax = %.5e" % flowVars.U.max(), ", Vmax = %.5e" % flowVars.V.max()
 
       if (nIter % nIterWrite == 0):
          plotStreamLine(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
-         plotContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
+         plotUmagContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
+         #field = 'P'
+         #plotContour(domainVars.x, domainVars.y, flowVars.P, nIter, field)
          #plotTempContour(domainVars.x, domainVars.y, flowVars.T, nIter)
 
       #if (nIter >= maxIter or resNorm <= residualMin): break
