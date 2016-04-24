@@ -2,6 +2,50 @@ from variables import *
 
 import numpy as np
 
+def nondimensionalize(idomain, iflow):
+   # domain
+   if idomain == 1:
+      Lref = max(1e-9,domainVars.Lref)
+      domainVars.x = domainVars.x / Lref
+      domainVars.y = domainVars.y / Lref
+      domainVars.dx = domainVars.dx / Lref
+      domainVars.dy = domainVars.dy / Lref
+
+   # flow variables
+   if iflow == 1:
+      RHOref = max(1e-99, flowVars.RHOref)
+      Uref = max(1e-99, flowVars.Uref)
+      Tref = max(1e-99, flowVars.Tref)
+      flowVars.rho = flowVars.rho / RHOref
+      flowVars.U = flowVars.U / Uref
+      flowVars.V = flowVars.V / Uref
+      flowVars.P = flowVars.P / (RHOref * Uref ** 2)
+      flowVars.T = flowVars.T / Tref
+      flowVars.ei = flowVars.ei / Uref ** 2
+      flowVars.et = flowVars.et / Uref ** 2
+
+def dimensionalize(idomain, iflow):
+   # domain
+   if idomain == 1:
+      Lref = max(1e-9,domainVars.Lref)
+      domainVars.x = domainVars.x * Lref
+      domainVars.y = domainVars.y * Lref
+      domainVars.dx = domainVars.dx * Lref
+      domainVars.dy = domainVars.dy * Lref
+
+   # flow variables
+   if iflow == 1:
+      RHOref = max(1e-99, flowVars.RHOref)
+      Uref = max(1e-99, flowVars.Uref)
+      Tref = max(1e-99, flowVars.Tref)
+      flowVars.rho = flowVars.rho * RHOref
+      flowVars.U = flowVars.U * Uref
+      flowVars.V = flowVars.V * Uref
+      flowVars.P = flowVars.P * (RHOref * Uref ** 2)
+      flowVars.T = flowVars.T * Tref
+      flowVars.ei = flowVars.ei * Uref ** 2
+      flowVars.et = flowVars.et * Uref ** 2
+     
 def computeTimeStep(inputDict,imax,jmax):
    Cr      = float(inputDict['Courant'])
    gamma   = float(inputDict['gamma'])
@@ -55,51 +99,69 @@ def updateFluxVectors(inputDict,imax,jmax,iVisc):
    
    if beta > 0.0:
       FDM.Fi[0] = flowVars.U / beta
-      FDM.Fi[1] = flowVars.U * flowVars.U + flowVars.P
+      FDM.Fi[1] = flowVars.U * flowVars.U + flowVars.P / flowVars.rho
       FDM.Fi[2] = flowVars.U * flowVars.V
-      FDM.Fi[3] = flowVars.U * flowVars.et
+      FDM.Fi[3] = flowVars.U * (flowVars.et + flowVars.P / flowVars.rho)
 
       FDM.Gi[0] = flowVars.V / beta
       FDM.Gi[1] = flowVars.V * flowVars.U
-      FDM.Gi[2] = flowVars.V * flowVars.V + flowVars.P
-      FDM.Gi[3] = flowVars.V * flowVars.et
+      FDM.Gi[2] = flowVars.V * flowVars.V + flowVars.P / flowVars.rho
+      FDM.Gi[3] = flowVars.V * (flowVars.et + flowVars.P / flowVars.rho)
 
    else:
       # flux vector in x-direction
       FDM.Fi[0] = flowVars.rho * flowVars.U
       FDM.Fi[1] = flowVars.rho * flowVars.U * flowVars.U + flowVars.P
       FDM.Fi[2] = flowVars.rho * flowVars.U * flowVars.V
-      FDM.Fi[3] = flowVars.rho * flowVars.U * flowVars.et
+      FDM.Fi[3] = flowVars.U * (flowVars.rho * flowVars.et + flowVars.P)
 
       # flux vector in y-direction
       FDM.Gi[0] = flowVars.rho * flowVars.V
       FDM.Gi[1] = flowVars.rho * flowVars.V * flowVars.U
       FDM.Gi[2] = flowVars.rho * flowVars.V * flowVars.V + flowVars.P
-      FDM.Gi[3] = flowVars.rho * flowVars.V * flowVars.et
+      FDM.Gi[3] = flowVars.V * (flowVars.rho * flowVars.et + flowVars.P)
 
    # update diffusive flux
    if iVisc == 1:
-      Tau, Qj = computeDiffusiveTransport(imax,jmax)
+      Tau, Qj = computeDiffusiveTransport(inputDict,imax,jmax)
+
       if beta > 0.0:
-         Tau = Tau / flowVars.rhoRef
-         Qj  = Qj  / flowVars.rhoRef
+         FDM.Fv[0] = np.zeros((imax,jmax))
+         FDM.Fv[1] = Tau[:,:,0,0] / flowVars.rho
+         FDM.Fv[2] = Tau[:,:,0,1] / flowVars.rho
+         FDM.Fv[3] = (-Qj[:,:,0] + flowVars.U * Tau[:,:,0,0] + flowVars.V * Tau[:,:,0,1]) / flowVars.rho
 
-      FDM.Fv[0] = np.zeros((imax,jmax))
-      FDM.Fv[1] = Tau[:,:,0,0]
-      FDM.Fv[2] = Tau[:,:,0,1]
-      FDM.Fv[3] = -Qj[:,:,0] + flowVars.U * Tau[:,:,0,0] + flowVars.V * Tau[:,:,0,1]
+         FDM.Gv[0] = np.zeros((imax,jmax))
+         FDM.Gv[1] = Tau[:,:,1,0] / flowVars.rho
+         FDM.Gv[2] = Tau[:,:,1,1] / flowVars.rho
+         FDM.Gv[3] = (-Qj[:,:,1] + flowVars.U * Tau[:,:,1,0] + flowVars.V * Tau[:,:,1,1]) / flowVars.rho
 
-      FDM.Gv[0] = np.zeros((imax,jmax))
-      FDM.Gv[1] = Tau[:,:,1,0]
-      FDM.Gv[2] = Tau[:,:,1,1]
-      FDM.Gv[3] = -Qj[:,:,1] + flowVars.U * Tau[:,:,1,0] + flowVars.V * Tau[:,:,1,1]
+      else:
+         FDM.Fv[0] = np.zeros((imax,jmax))
+         FDM.Fv[1] = Tau[:,:,0,0]
+         FDM.Fv[2] = Tau[:,:,0,1]
+         FDM.Fv[3] = -Qj[:,:,0] + flowVars.U * Tau[:,:,0,0] + flowVars.V * Tau[:,:,0,1]
+
+         FDM.Gv[0] = np.zeros((imax,jmax))
+         FDM.Gv[1] = Tau[:,:,1,0]
+         FDM.Gv[2] = Tau[:,:,1,1]
+         FDM.Gv[3] = -Qj[:,:,1] + flowVars.U * Tau[:,:,1,0] + flowVars.V * Tau[:,:,1,1]
 
 
 
-def computeDiffusiveTransport(imax,jmax):
+def computeDiffusiveTransport(inputDict,imax,jmax):
    from transport import sutherland
+
    # gas transport properties
+   nonDim = int(inputDict['nonDim'])
+   if nonDim == 1:
+      dimensionalize(0,1)
    mu, k = sutherland(flowVars.T)
+   if nonDim == 1:
+      nondimensionalize(0,1)
+      mu = mu / flowVars.MUref
+      k  = k  / flowVars.Kref
+
    # UiXj: Xj derivative of Ui
    UiXj = np.zeros((imax,jmax,2,2))
 
@@ -173,10 +235,12 @@ def updatePrimitiveVariables(inputDict,imax,jmax):
       flowVars.T[1:imax-1,1:jmax-1]   = flowVars.ei[1:imax-1,1:jmax-1] / Cv
       flowVars.P[1:imax-1,1:jmax-1]   = flowVars.rho[1:imax-1,1:jmax-1] * Rgas * flowVars.T[1:imax-1,1:jmax-1]
    else:
-      flowVars.P[1:imax-1,1:jmax-1] = FDM.phi[0][1:imax-1,1:jmax-1]
-      flowVars.U[1:imax-1,1:jmax-1] = FDM.phi[1][1:imax-1,1:jmax-1]
-      flowVars.V[1:imax-1,1:jmax-1] = FDM.phi[2][1:imax-1,1:jmax-1]
-
+      flowVars.P[1:imax-1,1:jmax-1]  = FDM.phi[0][1:imax-1,1:jmax-1]
+      flowVars.U[1:imax-1,1:jmax-1]  = FDM.phi[1][1:imax-1,1:jmax-1]
+      flowVars.V[1:imax-1,1:jmax-1]  = FDM.phi[2][1:imax-1,1:jmax-1]
+      flowVars.et[1:imax-1,1:jmax-1] = FDM.phi[3][1:imax-1,1:jmax-1]
+      flowVars.ei[1:imax-1,1:jmax-1] = flowVars.et[1:imax-1,1:jmax-1] - 0.5 * (flowVars.U[1:imax-1,1:jmax-1] ** 2 - flowVars.V[1:imax-1,1:jmax-1] ** 2)
+      flowVars.T[1:imax-1,1:jmax-1]  = flowVars.ei[1:imax-1,1:jmax-1] / flowVars.CVref
 
 def centralFiniteDifference(phi, direction):
    imax = len(phi[:,0])

@@ -51,10 +51,11 @@ def updateBC(inputDict,imax,jmax):
    # Upper boundary: adiabatic, no-slip wall
    # Do NOT update on velocity fields
    # pressure gradient zero normal to the wall
-   flowVars.U[:,jmax-1] = flowVars.Ujet
+   flowVars.U[:,jmax-1] = flowVars.Uref
    flowVars.V[:,jmax-1] = 0.0
    flowVars.P[:,jmax-1] = flowVars.P[:,jmax-2]
-   flowVars.T[:,jmax-1] = flowVars.T[:,jmax-2]
+   #flowVars.T[:,jmax-1] = flowVars.T[:,jmax-2]
+   flowVars.T[:,jmax-1] = flowVars.Tref
    if beta == 0:
       flowVars.rho[:,jmax-1] = flowVars.P[:,jmax-1] / (Rgas * flowVars.T[:,jmax-1])
 

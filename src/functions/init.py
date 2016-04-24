@@ -17,7 +17,8 @@ def initSimulationVars(inputDict):
    gamma = float(inputDict['gamma'])
    # For Artificial Compressibility Method
    beta  = float(inputDict['beta'])
-   
+   nonDim = int(inputDict['nonDim'])   
+
    # Cv: constant volume specific heat
    Cv    = Rgas / (gamma - 1.0)
 
@@ -35,6 +36,16 @@ def initSimulationVars(inputDict):
    Ujet  = muRef * jetRe / (RHOjet * Dref)
    flowVars.Ujet = Ujet
 
+   # Set reference scales
+   domainVars.Lref = Dref
+   flowVars.Uref = Ujet
+   flowVars.RHOref = RHOjet
+   flowVars.Tref = jetTemp
+   flowVars.MUref = muRef
+   flowVars.Kref  = kRef
+   flowVars.CVref = flowVars.Uref ** 2 / flowVars.Tref
+   print flowVars.CVref
+
    print '# Gas jet velocity = ', Ujet
    print '# Jet diameter = ', Dref
    print '# Jet Reynolds no = ', jetRe
@@ -44,20 +55,16 @@ def initSimulationVars(inputDict):
    flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
-   # For ACM, convert dynamic pressure into kinematic pressure
-   if beta > 0.0:
-      # Since ACM is for incompressible solution, rhoRef is used for constant density.
-      # ACM does NOT update density. INCOMPRESSIBLE solution.
-      flowVars.rhoRef = Pinit / (Rgas * Tinit)
-      flowVars.P = flowVars.P / flowVars.rhoRef
-   else:
-      flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
-
+   flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
    # compute energy per unit mass from EOS relation
    flowVars.ei   = Cv * flowVars.T
    flowVars.et   = flowVars.ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
 
+   print Cv
    updateBC(inputDict,imax,jmax)
+
+   if nonDim == 1:
+      nondimensionalize(1,1)
 
    # state vector is populated with given initial condition at very first beginning.
    # Then, state vector will updated during the time integration process only.

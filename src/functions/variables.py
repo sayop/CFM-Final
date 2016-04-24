@@ -11,7 +11,12 @@ class flowVars:
    Ujet = 0.0
    jetTemp = 0.0
    jetRe = 0.0     # Reynolds number
-   rhoRef = 0.0
+   RHOref = 0.0
+   Uref   = 0.0
+   Tref   = 0.0
+   MUref  = 0.0
+   Kref   = 0.0
+
    rho = []
    P   = []
    U   = []
