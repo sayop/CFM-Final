@@ -59,6 +59,7 @@ def computeTimeStep(inputDict,imax,jmax):
    gamma   = float(inputDict['gamma'])
    Rgas    = float(inputDict['gasConst'])
    beta    = float(inputDict['beta'])
+   nonDim  = int(inputDict['nonDim'])
    dx = domainVars.dx
    dy = domainVars.dy
 
@@ -67,6 +68,8 @@ def computeTimeStep(inputDict,imax,jmax):
       a = 1.0 / np.sqrt(beta)
    else:
       a = computeSpeedOfSound(flowVars.T,gamma,Rgas)
+      # Nondimensionalized speed of sound
+      if nonDim == 1: a = a * flowVars.Tref ** 0.5 / flowVars.Uref
 
    Uconv = abs(flowVars.U) + a
    Vconv = abs(flowVars.V) + a
@@ -203,7 +206,7 @@ def computeDiffusiveTransport(inputDict,imax,jmax):
       for j in range(2):
          if j == 0: direction = 'x'
          if j == 1: direction = 'y'
-         Qj[:,:,j] = k * centralFiniteDifference(-flowVars.T, direction)
+         Qj[:,:,j] = -k * centralFiniteDifference(flowVars.T, direction)
 
    return Tau, Qj
 
