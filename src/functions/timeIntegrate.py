@@ -28,9 +28,9 @@ def timeIntegrate(inputDict):
    while True:
       # plot initial condition
       if nIter == 0: 
-         if nonDim == 1: dimensionalize(1, 1)
+         if nonDim == 1: dimensionalize(inputDict,1, 1)
          plotUmagContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
-         if nonDim == 1: nondimensionalize(1, 1)
+         if nonDim == 1: nondimensionalize(inputDict,1, 1)
 
       nIter += 1
       # Find time step that may stabilize the solution with given Courant number
@@ -40,31 +40,31 @@ def timeIntegrate(inputDict):
       updateFluxVectors(inputDict,imax,jmax,iVisc)
 
       # update Q vector: Q vector contains finite differenced state vectors to update state vector in time
-      updateQvector(imax,jmax,iVisc)
+      updateQvector(inputDict,imax,jmax,iVisc)
 
       # update state vector from Q vector
-      integrateStateVector(dt)
+      integrateStateVector(inputDict,dt)
 
       # compute primitive variables from state vector elements: update only interior points
       updatePrimitiveVariables(inputDict,imax,jmax)
 
       # update boundary condition
-      if nonDim == 1: dimensionalize(0, 1)
+      if nonDim == 1: dimensionalize(inputDict,0, 1)
       updateBC(inputDict,imax,jmax)
-      if nonDim == 1: nondimensionalize(0, 1)
+      if nonDim == 1: nondimensionalize(inputDict,0, 1)
       
       t += dt
       print "|- nIter = %s" % nIter, ", t = %.5e" % t, ", dt = %.5e" % dt, ", Tmax = %.5e" % flowVars.T.max(), ", Tmin = %.5e" % flowVars.T.min(), ", Pmax = %.5e" % flowVars.P.max(), ", Umax = %.5e" % flowVars.U.max(), ", Vmax = %.5e" % flowVars.V.max()
 
       if (nIter % nIterWrite == 0):
-         if nonDim == 1: dimensionalize(1, 1)
+         if nonDim == 1: dimensionalize(inputDict,1, 1)
          plotStreamLine(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
          plotUmagContour(domainVars.x, domainVars.y, flowVars.U, flowVars.V, nIter)
          #field = 'P'
          #plotContour(domainVars.x, domainVars.y, flowVars.P, nIter, field)
          field = 'T'
          plotContour(domainVars.x, domainVars.y, flowVars.T, nIter, field)
-         if nonDim == 1: nondimensionalize(1, 1)
+         if nonDim == 1: nondimensionalize(inputDict,1, 1)
 
       #if (nIter >= maxIter or resNorm <= residualMin): break
       if (nIter >= maxIter): break

@@ -16,6 +16,7 @@ class flowVars:
    Tref   = 0.0
    MUref  = 0.0
    Kref   = 0.0
+   Rref   = 0.0
 
    rho = []
    P   = []

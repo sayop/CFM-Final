@@ -52,23 +52,19 @@ def initSimulationVars(inputDict):
 
 
    flowVars.P    = Pinit * np.ones((imax,jmax))
-   if beta == 0: flowVars.T    = Tinit * np.ones((imax,jmax))
-   if beta > 0:  flowVars.T    = jetTemp * np.ones((imax,jmax))
+   flowVars.T    = Tinit * np.ones((imax,jmax))
    flowVars.U    = Uinit * np.ones((imax,jmax))
    flowVars.V    = Vinit * np.ones((imax,jmax))
    flowVars.rho  = flowVars.P / (Rgas * flowVars.T)
    # compute energy per unit mass from EOS relation
-   if beta == 0:
-      flowVars.ei   = flowVars.P / (flowVars.rho * (gamma - 1.0))
-      flowVars.et   = flowVars.ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
-   # if ACM, change P (dynamic pressure) to kinematic pressure and rho (density) will never be updated.
-   if beta > 0:
-      flowVars.P = flowVars.P / flowVars.rho
+   flowVars.ei   = flowVars.P / (flowVars.rho * (gamma - 1.0))
+   flowVars.et   = flowVars.ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
 
    updateBC(inputDict,imax,jmax)
 
    if nonDim == 1:
-      nondimensionalize(inputDict,1,1)
+      nondimensionalize(1,1)
+   print flowVars.P
 
    # state vector is populated with given initial condition at very first beginning.
    # Then, state vector will updated during the time integration process only.
