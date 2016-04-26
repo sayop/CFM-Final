@@ -38,7 +38,7 @@ def plotUmagContour(x,y,U,V,nIter):
    plt.setp(ylabels, fontsize=15)
 
    fig = plt.gcf()
-   fig.set_size_inches(6,5)
+   fig.set_size_inches(9,5)
    plt.tight_layout()
    plt.savefig(pltFile, format='png')
    plt.close()
@@ -82,7 +82,7 @@ def plotContour(x,y,phi,nIter,field):
    plt.setp(ylabels, fontsize=15)
 
    fig = plt.gcf()
-   fig.set_size_inches(6,5)
+   fig.set_size_inches(9,5)
    plt.tight_layout()
    plt.savefig(pltFile, format='png')
    plt.close()
@@ -113,7 +113,7 @@ def plotStreamLine(x,y,U,V,nIter):
    plt.setp(ylabels, fontsize=10)
 
    fig = plt.gcf()
-   fig.set_size_inches(6,5)
+   fig.set_size_inches(9,5)
    plt.tight_layout()
    plt.savefig(pltFile, format='png')
    plt.close()
@@ -148,7 +148,7 @@ def plotTempContour(x,y,T,nIter):
    plt.setp(ylabels, fontsize=15)
 
    fig = plt.gcf()
-   fig.set_size_inches(6,5)
+   fig.set_size_inches(9,5)
    plt.tight_layout()
    plt.savefig(pltFile, format='png')
    plt.close()

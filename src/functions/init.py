@@ -63,7 +63,7 @@ def initSimulationVars(inputDict):
       flowVars.et   = flowVars.ei + 0.5 * (flowVars.U ** 2 + flowVars.V ** 2)
    # if ACM, change P (dynamic pressure) to kinematic pressure and rho (density) will never be updated.
    if beta > 0:
-      flowVars.P = flowVars.P / flowVars.rho
+      flowVars.P = flowVars.P / flowVars.RHOref
 
    updateBC(inputDict,imax,jmax)
 

@@ -286,7 +286,7 @@ def centralFiniteDifference(phi, nOrder, direction):
    if direction == 'x':
       if nOrder == 1:
          #f[1:imax-1,1:jmax-1] = 0.5 * (phi[2:imax,1:jmax-1] - phi[0:imax-2,1:jmax-1]) / dx 
-         f[1:imax-1,1:jmax-2] = 0.5 * (phi[2:imax,1:jmax-2] - phi[0:imax-2,1:jmax-2]) / dx 
+         f[1:imax-1,1:jmax-1] = 0.5 * (phi[2:imax,1:jmax-1] - phi[0:imax-2,1:jmax-1]) / dx 
          # Forward
          #f[0,:] = (phi[1,:] - phi[0,:]) / dx
          #f[0,:] = 0.5 * (-3.0 * phi[0,:] + 4.0 * phi[1,:] - phi[2,:]) / dx
@@ -294,12 +294,12 @@ def centralFiniteDifference(phi, nOrder, direction):
          #f[imax-1,:] = (phi[imax-1,:] - phi[imax-2,:]) / dx
          #f[imax-1,:] = 0.5 * (3.0 * phi[imax-1,:] - 4.0 * phi[imax-2,:] + phi[imax-3,:]) / dx
       elif nOrder == 2:
-         f[1:imax-1,1:jmax-2] = ( phi[2:imax,1:jmax-2] - 2.0*phi[1:imax-1,1:jmax-2] + phi[0:imax-2,1:jmax-2] ) / dx ** 2
+         f[1:imax-1,1:jmax-1] = ( phi[2:imax,1:jmax-1] - 2.0*phi[1:imax-1,1:jmax-1] + phi[0:imax-2,1:jmax-1] ) / dx ** 2
 
    elif direction == 'y':
       if nOrder == 1:
          #f[1:imax-1,1:jmax-1] = 0.5 * (phi[1:imax-1,2:jmax] - phi[1:imax-1,0:jmax-2]) / dy
-         f[1:imax-2,1:jmax-1] = 0.5 * (phi[1:imax-2,2:jmax] - phi[1:imax-2,0:jmax-2]) / dy
+         f[1:imax-1,1:jmax-1] = 0.5 * (phi[1:imax-1,2:jmax] - phi[1:imax-1,0:jmax-2]) / dy
          # Forward
          #f[:,0] = (phi[:,1] - phi[:,0]) / dy
          #f[:,0] = 0.5 * (-3.0 * phi[:,0] + 4.0 * phi[:,1] - phi[:,2]) / dy
@@ -307,7 +307,7 @@ def centralFiniteDifference(phi, nOrder, direction):
          #f[:,jmax-1] = (phi[:,jmax-1] - phi[:,jmax-2]) / dy
          #f[:,jmax-1] = 0.5 * (3.0 * phi[:,jmax-1] - 4.0 * phi[:,jmax-2] + phi[:,jmax-3]) / dy
       elif nOrder == 2:
-         f[1:imax-2,1:jmax-1] = ( phi[1:imax-2,2:jmax] - 2.0*phi[1:imax-2,1:jmax-1] + phi[1:imax-2,0:jmax-2] ) / dy ** 2   
+         f[1:imax-1,1:jmax-1] = ( phi[1:imax-1,2:jmax] - 2.0*phi[1:imax-1,1:jmax-1] + phi[1:imax-1,0:jmax-2] ) / dy ** 2   
 
    return f
 
