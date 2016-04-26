@@ -26,7 +26,6 @@ def timeIntegrate(inputDict):
    t = tStart
    nIter = 0
    while True:
-      #print flowVars.T
       # plot initial condition
       if nIter == 0: 
          if nonDim == 1: dimensionalize(inputDict,1, 1)

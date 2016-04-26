@@ -1,5 +1,5 @@
 from variables import *
-
+from transport import sutherland
 import numpy as np
 
 def nondimensionalize(inputDict,idomain, iflow):
@@ -107,6 +107,7 @@ def populateStateVector(inputDict,imax,jmax):
 
 def updateFluxVectors(inputDict,imax,jmax,iVisc):
    beta  = float(inputDict['beta'])
+   nonDim = float(inputDict['nonDim'])
 
    if beta > 0.0:
       FDM.Fi[0] = flowVars.U / beta
@@ -132,16 +133,26 @@ def updateFluxVectors(inputDict,imax,jmax,iVisc):
 
    # update diffusive flux
    if iVisc == 1:
-      Tau, Qj = computeDiffusiveTransport(inputDict,imax,jmax)
-
+      if beta == 0:
+         Tau, Qj = computeDiffusiveTransport(inputDict,imax,jmax)
+      elif beta > 0:
+         mu, k = sutherland(flowVars.T)
+         if nonDim == 1:
+            mu = mu / flowVars.MUref
+            k  = k  / flowVars.Kref
+ 
       if beta > 0.0:
          FDM.Fv[0] = np.zeros((imax,jmax))
-         FDM.Fv[1] = Tau[:,:,0,0]
-         FDM.Fv[2] = Tau[:,:,0,1]
+         FDM.Fv[1] = mu * flowVars.U
+         FDM.Fv[2] = mu * flowVars.V
+         #FDM.Fv[1] = Tau[:,:,0,0]
+         #FDM.Fv[2] = Tau[:,:,0,1]
 
          FDM.Gv[0] = np.zeros((imax,jmax))
-         FDM.Gv[1] = Tau[:,:,1,0]
-         FDM.Gv[2] = Tau[:,:,1,1]
+         FDM.Gv[1] = mu * flowVars.U
+         FDM.Gv[2] = mu * flowVars.V
+         #FDM.Gv[1] = Tau[:,:,1,0]
+         #FDM.Gv[2] = Tau[:,:,1,1]
 
       else:
          FDM.Fv[0] = np.zeros((imax,jmax))
@@ -157,7 +168,6 @@ def updateFluxVectors(inputDict,imax,jmax,iVisc):
 
 
 def computeDiffusiveTransport(inputDict,imax,jmax):
-   from transport import sutherland
 
    beta = float(inputDict['beta'])
    # gas transport properties
@@ -167,7 +177,7 @@ def computeDiffusiveTransport(inputDict,imax,jmax):
    if nonDim == 1:
       mu = mu / flowVars.MUref
       k  = k  / flowVars.Kref
-     
+
    # UiXj: Xj derivative of Ui
    UiXj = np.zeros((imax,jmax,2,2))
 
@@ -177,7 +187,7 @@ def computeDiffusiveTransport(inputDict,imax,jmax):
       for j in range(2):
          if j == 0: direction = 'x'
          if j == 1: direction = 'y'
-         UiXj[:,:,i,j] = centralFiniteDifference(Ui, direction)
+         UiXj[:,:,i,j] = centralFiniteDifference(Ui, 1, direction)
 
    # UiXi: divergence of velocity vector
    # UiXi = dUdX + dVdY
@@ -195,6 +205,8 @@ def computeDiffusiveTransport(inputDict,imax,jmax):
             kDelta = 1.0
          else:
             kDelta = 0.0
+         # For incompressible method, no bulk viscosity
+         if beta > 0: kDelta = 0.0
          # Bulk viscosity coefficient: Lambda = -2/3 * mu
          Lambda = -2.0 / 3.0 * mu[i,j]
          Tau[:,:,i,j] = mu[i,j] * (UiXj[:,:,i,j] + UiXj[:,:,j,i]) + kDelta * Lambda * UiXi
@@ -206,7 +218,7 @@ def computeDiffusiveTransport(inputDict,imax,jmax):
       for j in range(2):
          if j == 0: direction = 'x'
          if j == 1: direction = 'y'
-         Qj[:,:,j] = -k * centralFiniteDifference(flowVars.T, direction)
+         Qj[:,:,j] = -k * centralFiniteDifference(flowVars.T, 1, direction)
 
    return Tau, Qj
 
@@ -218,11 +230,15 @@ def updateQvector(inputDict,imax,jmax,iVisc):
 
    for n in range(nElem):
       FDM.Q[n] = np.zeros((imax,jmax))
-      FDM.Q[n] += centralFiniteDifference(-FDM.Fi[n], 'x')
-      FDM.Q[n] += centralFiniteDifference(-FDM.Gi[n], 'y')
+      FDM.Q[n] += centralFiniteDifference(-FDM.Fi[n], 1, 'x')
+      FDM.Q[n] += centralFiniteDifference(-FDM.Gi[n], 1, 'y')
       if iVisc == 1:
-         FDM.Q[n] += centralFiniteDifference(FDM.Fv[n], 'x')
-         FDM.Q[n] += centralFiniteDifference(FDM.Gv[n], 'y')
+         if beta == 0:
+            FDM.Q[n] += centralFiniteDifference(FDM.Fv[n], 1, 'x')
+            FDM.Q[n] += centralFiniteDifference(FDM.Gv[n], 1, 'y')
+         elif beta > 0:
+            FDM.Q[n] += centralFiniteDifference(FDM.Fv[n], 2, 'x')
+            FDM.Q[n] += centralFiniteDifference(FDM.Gv[n], 2, 'y')
 
 
 def integrateStateVector(inputDict,dt):
@@ -259,7 +275,7 @@ def updatePrimitiveVariables(inputDict,imax,jmax):
       #flowVars.ei[1:imax-1,1:jmax-1] = flowVars.et[1:imax-1,1:jmax-1] - 0.5 * (flowVars.U[1:imax-1,1:jmax-1] ** 2 - flowVars.V[1:imax-1,1:jmax-1] ** 2)
       #flowVars.T[1:imax-1,1:jmax-1]  = flowVars.ei[1:imax-1,1:jmax-1] / flowVars.CVref
 
-def centralFiniteDifference(phi, direction):
+def centralFiniteDifference(phi, nOrder, direction):
    imax = len(phi[:,0])
    jmax = len(phi[0,:])
    dx = domainVars.dx
@@ -268,25 +284,30 @@ def centralFiniteDifference(phi, direction):
 
    # x-derivative
    if direction == 'x':
-      #f[1:imax-1,1:jmax-1] = 0.5 * (phi[2:imax,1:jmax-1] - phi[0:imax-2,1:jmax-1]) / dx 
-      f[1:imax-1,:] = 0.5 * (phi[2:imax,:] - phi[0:imax-2,:]) / dx 
-      # Forward
-      #f[0,:] = (phi[1,:] - phi[0,:]) / dx
-      f[0,:] = 0.5 * (-3.0 * phi[0,:] + 4.0 * phi[1,:] - phi[2,:]) / dx
-      # Backward
-      #f[imax-1,:] = (phi[imax-1,:] - phi[imax-2,:]) / dx
-      f[imax-1,:] = 0.5 * (3.0 * phi[imax-1,:] - 4.0 * phi[imax-2,:] + phi[imax-3,:]) / dx
+      if nOrder == 1:
+         #f[1:imax-1,1:jmax-1] = 0.5 * (phi[2:imax,1:jmax-1] - phi[0:imax-2,1:jmax-1]) / dx 
+         f[1:imax-1,1:jmax-2] = 0.5 * (phi[2:imax,1:jmax-2] - phi[0:imax-2,1:jmax-2]) / dx 
+         # Forward
+         #f[0,:] = (phi[1,:] - phi[0,:]) / dx
+         #f[0,:] = 0.5 * (-3.0 * phi[0,:] + 4.0 * phi[1,:] - phi[2,:]) / dx
+         # Backward
+         #f[imax-1,:] = (phi[imax-1,:] - phi[imax-2,:]) / dx
+         #f[imax-1,:] = 0.5 * (3.0 * phi[imax-1,:] - 4.0 * phi[imax-2,:] + phi[imax-3,:]) / dx
+      elif nOrder == 2:
+         f[1:imax-1,1:jmax-2] = ( phi[2:imax,1:jmax-2] - 2.0*phi[1:imax-1,1:jmax-2] + phi[0:imax-2,1:jmax-2] ) / dx ** 2
 
    elif direction == 'y':
-      #f[1:imax-1,1:jmax-1] = 0.5 * (phi[1:imax-1,2:jmax] - phi[1:imax-1,0:jmax-2]) / dy
-      f[:,1:jmax-1] = 0.5 * (phi[:,2:jmax] - phi[:,0:jmax-2]) / dy
-      # Forward
-      #f[:,0] = (phi[:,1] - phi[:,0]) / dy
-      f[:,0] = 0.5 * (-3.0 * phi[:,0] + 4.0 * phi[:,1] - phi[:,2]) / dy
-      # Backward
-      #f[:,jmax-1] = (phi[:,jmax-1] - phi[:,jmax-2]) / dy
-      f[:,jmax-1] = 0.5 * (3.0 * phi[:,jmax-1] - 4.0 * phi[:,jmax-2] + phi[:,jmax-3]) / dy
-      
+      if nOrder == 1:
+         #f[1:imax-1,1:jmax-1] = 0.5 * (phi[1:imax-1,2:jmax] - phi[1:imax-1,0:jmax-2]) / dy
+         f[1:imax-2,1:jmax-1] = 0.5 * (phi[1:imax-2,2:jmax] - phi[1:imax-2,0:jmax-2]) / dy
+         # Forward
+         #f[:,0] = (phi[:,1] - phi[:,0]) / dy
+         #f[:,0] = 0.5 * (-3.0 * phi[:,0] + 4.0 * phi[:,1] - phi[:,2]) / dy
+         # Backward
+         #f[:,jmax-1] = (phi[:,jmax-1] - phi[:,jmax-2]) / dy
+         #f[:,jmax-1] = 0.5 * (3.0 * phi[:,jmax-1] - 4.0 * phi[:,jmax-2] + phi[:,jmax-3]) / dy
+      elif nOrder == 2:
+         f[1:imax-2,1:jmax-1] = ( phi[1:imax-2,2:jmax] - 2.0*phi[1:imax-2,1:jmax-1] + phi[1:imax-2,0:jmax-2] ) / dy ** 2   
 
    return f
 

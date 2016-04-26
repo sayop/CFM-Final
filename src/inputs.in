@@ -8,7 +8,7 @@ ymax            10
 #nozzle setup
 jetRadius	5.0
 jetRe		100.0
-jetTemp		400.0
+jetTemp		300.0
 # pressure boundary for inflow/outflow
 Pinflow		1.0
 Poutflow	1.0
@@ -26,9 +26,9 @@ Tinit		300.0
 # if iVisc is 1, full Navier-Stokes equation.
 # if iVisc is 0, Euler equation.
 nonDim		1
-maxIter         1000000
+maxIter         4000000
 nIterWrite	1000
 iVisc		1
-Courant         0.05
+Courant         0.1
 # if beta > 0.0, ACM is used
 beta		0.5
