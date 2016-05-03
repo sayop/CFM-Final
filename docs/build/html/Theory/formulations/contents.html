@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Formulations &mdash; Final Project 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Final Project 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Theories" href="../index.html" />
+    <link rel="next" title="Numerical solution method" href="../../Numerical/contents.html" />
+    <link rel="prev" title="Introduction" href="../intro/contents.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../../Numerical/contents.html" title="Numerical solution method"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../intro/contents.html" title="Introduction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Final Project 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Theories</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="formulations">
+<h1>Formulations<a class="headerlink" href="#formulations" title="Permalink to this headline">¶</a></h1>
+<p>Passive scalar transport analsys should start with the case where reaction involves only fuel, oxidizer, and products:</p>
+<div class="math">
+\[\nu_{F}F + \nu_{O}O \rightleftharpoons \nu_{P}P\]</div>
+<p>The mass fraction <span class="math">\(Y_{k}\)</span> of each species follows a species conservation equation that can be expressed by:</p>
+<div class="math">
+\[\frac{\partial \rho Y_{k}}{\partial t} + \frac{\partial}{\partial x_{i}}\left ( \rho u_{i} Y_{k} \right ) = \frac{\partial}{\partial x_{i}}\left ( \rho D \frac{\partial Y_{k}}{\partial x_{i}} \right ) + \dot{\omega}_{k}\]</div>
+<p>Species production rates <span class="math">\(\dot{\omega}_{k}\)</span> are all related to each species because their production and consumption are correlated in a single step reaction. Note that this approach works out for the single step reaction assumption. Let <span class="math">\(Q\)</span> is the single-step reaction rate such that following relation can be introduced:</p>
+<div class="math">
+\[\dot{\omega}_{k} = W_{k} \nu_{k} Q\]</div>
+<p>It enables to relates the oxidizer reaction rate to the fuel reaction rate given by:</p>
+<div class="math">
+\[\dot{\omega}_{O} = s \dot{\omega}_{F} \;\;\; \text{with} \;\;\; s = \frac{\nu_{O} W_{O}}{\nu_{F} W_{F}}\]</div>
+<p>where <span class="math">\(s\)</span> is the mass stoichimetric ratio. And the reaction rate for temperature is also obviously linked to the fuel reaction rate:</p>
+<div class="math">
+\[\dot{\omega}_{T} = -Q \dot{\omega}_{F}\]</div>
+<p>Using the relation stated above, three conservation equation for all three species in the single step reaction can be formulated:</p>
+<div class="math">
+\[\frac{\partial \rho Y_{F}}{\partial t} + \frac{\partial}{\partial x_{i}} \left ( \rho u_{i} Y_{F} \right ) = \frac{\partial }{\partial x_{i}} \left ( \rho D \frac{\partial Y_{F}}{\partial x_{i}} \right ) + \dot{\omega}_{F}\]\[\frac{\partial \rho Y_{O}}{\partial t} + \frac{\partial}{\partial x_{i}} \left ( \rho u_{i} Y_{O} \right ) = \frac{\partial }{\partial x_{i}} \left ( \rho D \frac{\partial Y_{O}}{\partial x_{i}} \right ) + s\dot{\omega}_{F}\]\[\frac{\partial \rho T}{\partial t} + \frac{\partial}{\partial x_{i}} \left ( \rho u_{i} T \right ) = \frac{\partial }{\partial x_{i}} \left ( \frac{\lambda}{C_{p}} \frac{\partial T}{\partial x_{i}} \right ) - \frac{Q}{C_{p}} \dot{\omega}_{F}\]</div>
+<p>As of now, we are still having three conservation equations in addition to continuity, momentum equations to solve the diffusion flame physics. Our goal is to reduce the number of balance equation by employing a new variable. To obtain this goal, we can simplify the given equation by combining above three quations two by two, assuming unity Lewis numbers (<span class="math">\(Le=\lambda / \rho C_{p} D = 1\)</span>). This can achieved by linking the dependent variables, <span class="math">\(Y_{F}\)</span>, <span class="math">\(Y_{O}\)</span>, and <span class="math">\(T\)</span>:</p>
+<div class="math">
+\[Z_{1} = sY_{F} - Y_{O}\;\; ; \;\;\;\; Z_{2} = \frac{C_{p}T}{Q} + Y_{F} \;\; ; \;\;\;\; Z_{3} = s \frac{C_{p}T}{Q} + Y_{O}\]</div>
+<p>These three quantities follow the same balance equation dropping the source terms:</p>
+<div class="math">
+\[\frac{\partial \rho Z}{\partial t} + \frac{\partial}{\partial x_{i}}\left ( \rho u_{i} Z \right ) = \frac{\partial}{\partial x_{i}} \left ( \rho D \frac{\partial Z}{\partial x_{i}} \right )\]</div>
+<p>Here <span class="math">\(Z\)</span> is now introduced as a passive (or called conserved) scalar and changes only due to diffusion and convection. Without source term, this quantity is supposed to vary monotonically with properly setup of boundary condition. Now the three variables <span class="math">\(Z_{1}\)</span>, <span class="math">\(Z_{2}\)</span> and <span class="math">\(Z_{3}\)</span> follow the same balance equation stated above but have different boundary condition. It means these quantities stil have to be resolved in their own transport equation. To finally reduce the set of equations, the quantities should be normalized such a way that they end up with same boundary condition as well as same balance equation. The normalized <span class="math">\(z_{j}\)</span> variables can be achieved by defining:</p>
+<div class="math">
+\[Z_{1} = sY_{F} - Y_{O}\;\; ; \;\;\;\; Z_{2} = \frac{C_{p}T}{Q} + Y_{F} \;\; ; \;\;\;\; Z_{3} = s \frac{C_{p}T}{Q} + Y_{O}\]</div>
+<p>These three quantities follow the same balance equation dropping the source terms:</p>
+<div class="math">
+\[\frac{\partial \rho Z}{\partial t} + \frac{\partial}{\partial x_{i}}\left ( \rho u_{i} Z \right ) = \frac{\partial}{\partial x_{i}} \left ( \rho D \frac{\partial Z}{\partial x_{i}} \right )\]</div>
+<p>Here <span class="math">\(Z\)</span> is now introduced as a passive (or called conserved) scalar and changes only due to diffusion and convection. Without source term, this quantity is supposed to vary monotonically with properly setup of boundary condition. Now the three variables <span class="math">\(Z_{1}\)</span>, <span class="math">\(Z_{2}\)</span> and <span class="math">\(Z_{3}\)</span> follow the same balance equation stated above but have different boundary condition. It means these quantities stil have to be resolved in their own transport equation. To finally reduce the set of equations, the quantities should be normalized such a way that they end up with same boundary condition as well as same balance equation. The normalized <span class="math">\(z_{j}\)</span> variables can be achieved by defining:</p>
+<div class="math">
+\[z_{j} = \frac{Z_{j}-Z_{j}^{O}}{Z_{j}^{F}-Z_{j}^{O}} \;\;\;\; \text{for}\;\; j = 1,2,3\]</div>
+<p>Now all reduced variables <span class="math">\(z_{j}\)</span> follow the same transport equation expressed by:</p>
+<div class="math">
+\[\frac{\partial \rho z_{j}}{\partial t} + \frac{\partial }{\partial x_{i}}\left ( \rho u_{i} z_{j} \right ) = \frac{\partial}{\partial x_{i}}\left ( \rho D \frac{\partial z_{j}}{\partial x_{i}} \right )\]</div>
+<p>and have the same boundary conditions: math:<cite>z_{j}</cite> = 1 in the fuel stream and <span class="math">\(z_{j}\)</span> = 0 in the oxidizer stream. And this <span class="math">\(z\)</span> is now called the mixture fraction and measures the local fuel/oxidizer ratio. Again, this mixture fraction can also be converted to desired thermodynamic properties by formulating the following relations:</p>
+<div class="math">
+\[z = \frac{s Y_{F}-Y_{O}+Y_{O}^{0}}{sY_{F}^{0}+Y_{O}^{0}} = \frac{\frac{C_{p}}{Q}(T - T_{O}^{0}) + Y_{F}}{\frac{C_{p}}{Q} (T_{F}^{0} - T_{O}^{0} + Y_{F}^{0})} = \frac{\frac{sC_{p}}{Q} (T - T_{O}^{0}) + Y_{O} - Y_{O}^{0}}{\frac{sC_{p}}{Q}(T_{F}^{0} - T_{O}^{0}) - Y_{O}^{0}}\]</div>
+<p>Now we came up with the finalized form of reduced balance equation without source term such that is is easily to solve it numerically and analytically sometime. However, it is not sufficient to resolve the reacting field. The given form of equation only provides the mixing properties with no combustion. In order to simulate the reacting field, we need an additional assumption: infinitely fast chemistry.</p>
+<p>In this assumption, the chemical kinetics goes much faster than all flow process such as mixing. Since our approach is based on the single step reaction, there should be no chance that fuel and oxidizer co-exist. It meands that there will be a pure &#8216;fuel&#8217; side with <span class="math">\(Y_{F} = 0\)</span> and a pure &#8216;oxidizer&#8217; side with <span class="math">\(Y_{O} = 0\)</span>. Based on this assumption, the solution can classified into two separate zone:</p>
+<ul>
+<li><p class="first">Fuel side (<span class="math">\(z &gt; z_{st}\)</span>):</p>
+<div class="math">
+\[Y_{F}(z) = zY_{F}^{0} + (z-1)\frac{Y_{O}^{0}}{s} = Y_{F}^{0}\frac{z-z_{st}}{1-z_{st}}\]\[Y_{O}(z) = 0\]\[T(z) = zT_{F}^{0} + (1-z)T_{O}^{0} + \frac{QY_{F}^{0}}{C_{p}}z_{st}\frac{1-z}{1-z_{st}}\]</div>
+</li>
+<li><p class="first">Oxidizer side (<span class="math">\(z &lt; z_{st}\)</span>):</p>
+<div class="math">
+\[Y_{F}(z) = 0\]\[Y_{O}(z) = Y_{O}^{0} \left ( 1-\frac{z}{z_{st}} \right )\]\[T(z) = zT_{F}^{0} + (1-z)T_{O}^{0} + \frac{QY_{F}^{0}}{C_{p}}z\]</div>
+</li>
+</ul>
+<p>where the flame position in the <span class="math">\(z\)</span>-space, <span class="math">\(z_{st}\)</span> is determined by expressing that the flame is located where both <span class="math">\(Y_{F}\)</span> and <span class="math">\(Y_{O}\)</span> are zero. At this location, <span class="math">\(z\)</span> is equal to its stoichiometric value given by:</p>
+<div class="math">
+\[z_{st} = \frac{1}{1+ \frac{sY_{F}^{0}}{Y_{O}^{0}}}\]</div>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../intro/contents.html"
+                        title="previous chapter">Introduction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../../Numerical/contents.html"
+                        title="next chapter">Numerical solution method</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/Theory/formulations/contents.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../../Numerical/contents.html" title="Numerical solution method"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../intro/contents.html" title="Introduction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Final Project 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Theories</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Sayop Kim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>

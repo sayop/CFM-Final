@@ -1,0 +1,170 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Numerical solution method &mdash; Final Project 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../_static/jquery.js"></script>
+    <script type="text/javascript" src="../_static/underscore.js"></script>
+    <script type="text/javascript" src="../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Final Project 0.0.1 documentation" href="../index.html" />
+    <link rel="next" title="Setup" href="../Setup/contents.html" />
+    <link rel="prev" title="Formulations" href="../Theory/formulations/contents.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../Setup/contents.html" title="Setup"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../Theory/formulations/contents.html" title="Formulations"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Final Project 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="numerical-solution-method">
+<h1>Numerical solution method<a class="headerlink" href="#numerical-solution-method" title="Permalink to this headline">¶</a></h1>
+<p>In this project, arbitrary compressibility method (ACM) is employed to solve the set of balance equations. The ACM is supposed to solve the continuity and momentum equation in a way of compressible solution method by introducing pseudo time integration in continuity equation. Unlike the way of typical density based solution, this method is to solve the pressure that is manipulated with arbitrary compressibility in the continuity equation insteady of density itself. So the algorithm is not proper for unsteady solution because of its pseudo time integration. However, it is very efficient to achieve steady solutin with a very less computational effort because it does not come up with higher value of characteristic velocity in the convective terms. Therefore the time step for this method does not have to reach up to the level of time scale of wave propagation.</p>
+<p>In this particular problem set, we need to add one additional balance equation with dependent variable of mixture fraction, <span class="math">\(z\)</span>. This can be easily achieve by simply adding the variable into the state variable vector. Like the same way of original ACM approach, the flux vector only needs to contain additional element corresponding to the convection and diffusion terms of passive scalar transport equation.</p>
+<p>For this reason, the solution method is pretty much similar with the previous homework problem. The brief introduction of ACM approach is summarized below and onlly additional description of modified state vector and flux vectors are listed after that.</p>
+<ul>
+<li><p class="first">Continuity (incompressible)</p>
+<div class="math">
+\[\frac{\partial u_{i}}{\partial x_{i}} = 0\]</div>
+</li>
+<li><p class="first">Momentum equation:</p>
+<div class="math">
+\[\frac{\partial u_{i}}{\partial t} + \frac{\partial u_{i}u_{j}}{\partial x_{j}} = -\frac{1}{\rho}\frac{\partial p}{\partial x_{i}} + \nu \frac{\partial}{\partial x_{j}}\left ( \frac{\partial u_{i}}{\partial x_{j}} \right )\]</div>
+</li>
+<li><p class="first">Non-dimensionalization of the Navier-Stokes equations</p>
+<p>In some cases, it is beneficial to non-dimensionalize the given transport equation because it eases the analysis of problem of interest, and also may reduce the number of parameters. The non-dimensionalized form of the Navier-Stokes equation can be achieved by first normalizing the primitive variables as followings:</p>
+<div class="math">
+\[\tilde{u_{i}} = \frac{u_{i}}{U_{\text{ref}}},\;\;  \tilde{x_{i}} = \frac{x_{i}}{L_{\text{ref}}},\;\; \tilde{\rho}=\frac{\rho}{\rho_{\text{ref}}},\;\;\tilde{P} = \frac{P}{\rho_{\text{ref}}\, U^{2}_{\text{ref}}},\;\; \tilde{t}=\frac{t}{L/U_{\text{ref}}}\]</div>
+<p>For the final form of non-dimensionalized Navier-Stokes equation, tilda, <span class="math">\(\tilde{}\)</span>, will be dropped out for brevity and a new non-dimensional physical parameter <span class="math">\(Re\)</span> that represents the flow intertia against the fluid viscosity is introduced. Now we got:</p>
+<div class="math">
+\[\frac{\partial u_{i}}{\partial t} + \frac{\partial u_{i}u_{j}}{\partial x_{j}} = -\frac{1}{\rho}\frac{\partial p}{\partial x_{i}} + \frac{1}{\text{Re}} \frac{\partial}{\partial x_{j}}\left ( \frac{\partial u_{i}}{\partial x_{j}} \right )\]</div>
+<p>where the Reynolds number is defined as:</p>
+<div class="math">
+\[\text{Re} = \frac{U_{\text{ref}}L_{\text{ref}}}{\nu}\]</div>
+</li>
+<li><p class="first">Artificial Compressiblity Method (ACM)</p>
+<p>In the artificial compressibility method (ACM), the continuity equation is modified adding an unsteady term with ariticial compressiblity <span class="math">\(\beta\)</span>. To have this new form of continuity equation, an artificial equation of state that relates pressure, <span class="math">\(P\)</span>, to artificial density <span class="math">\(\tilde{\rho}\)</span> is emploeyd as following form:</p>
+<div class="math">
+\[P = \frac{\tilde{\rho}}{\beta}\]</div>
+<p>Finally, the modified continuity equation can then be recast as:</p>
+<div class="math">
+\[\frac{\partial P}{\partial t} + \frac{1}{\beta} \frac{\partial u_{i}}{\partial x_{i}} = 0\]</div>
+</li>
+<li><p class="first">Addition of passive scalar transport equation</p>
+<p>In this project, the mixture fraction <span class="math">\(z\)</span> field needs to be added to the equation set. Looking at given transport equation of mixture fraction, it looks pretty much similar to the above equation set in terms of having convection and diffusion terms in common. As opposed to the derived equation in the previous section, we need to drop density quantity out of the equation because of incompressible flow assumption. As a result, the mixture fraction transport equation is rewritten in the form:</p>
+<div class="math">
+\[\frac{\partial z}{\partial t} + \frac{\partial u_{j}z }{\partial x_{j}} = \frac{\partial }{\partial x_{j}}\left ( \text{Re} D \frac{\partial z}{\partial x_{j}} \right )\]</div>
+</li>
+<li><p class="first">Vector form of transport equations</p>
+<p>Rewriting the previously drived non-dimensionalized continuity and momentum equation in vector form generates a simple format that eases implementation of the numerical method. The above transport equation can be newly formed as shown below:</p>
+<div class="math">
+\[\frac{\partial \vec{U}}{\partial t} + \frac{\partial \vec{E}}{\partial x} + \frac{\partial \vec{F}}{\partial y} = \frac{1}{\text{Re}} \left ( \frac{\partial^{2}}{\partial x^{2}} + \frac{\partial^{2}}{\partial y^{2}} \right ) \vec{U}\]</div>
+<p>where the each of vector elements are summarized below:</p>
+<div class="math">
+\[\begin{split}\vec{U} = \begin{bmatrix}P\\ u\\ v \\ z \end{bmatrix}, \;\; \vec{E} = \begin{bmatrix} \frac{u}{\beta}\\ uu + P\\ uv \\ uz \end{bmatrix}, \;\; \vec{F} = \begin{bmatrix} \frac{v}{\beta}\\ uv\\ vv + P \\ vz \end{bmatrix}\end{split}\]</div>
+<p>Now this is good to go further for descritization because the given task is to solve explicit form of discretization equation. Even though the derived form of transport equation is not linearized, each of vectors above are easily discretized in terms of their elements that are combinations of each primitive variables. Thus, in this project, actual discretization has been doen form the driven transport equation above.</p>
+</li>
+<li><p class="first">Finding time step algorithm</p>
+<p>In order to find time step that may stabilize the numerical solution, we need to know system convecting velocity as we pick the coefficient of spatial derivative terms in Burger&#8217;s and Euler equations as the convection velocity. The driven system of equation is not a single partial different equation but a set of three different partial different equation. To find the convection speed of numerical information in the time and space domains, we need to first linearize the given system of equations and find the Eigen values. The linearization can be obatained by following process. The driven system of PDE should be reformulated in linearized set of equations:</p>
+<div class="math">
+\[\frac{\partial \vec{U}}{\partial t}  + \left [ A \right ] \frac{\partial \vec{U}}{\partial x} + \left [ B \right ] \frac{\partial \vec{U}}{\partial y} = \frac{1}{\text{Re}} \left ( \frac{\partial^{2}}{\partial x^{2}} + \frac{\partial^{2}}{\partial y^{2}} \right ) \vec{U}\]</div>
+<p>Now we have found two coefficient matrices of convection terms and the spatial derivatives is now taken with respect to <span class="math">\(\vec{U}\)</span> only. Despite the vector form, the PDE form is a identical with Burger&#8217;s equation. The coefficient matrices are below listed:</p>
+<div class="math">
+\[\begin{split}\left [ A \right ] = \begin{bmatrix} 0 &amp; \frac{1}{\beta} &amp; 0 \\ 1 &amp; 2u &amp; 0\\ 0 &amp; v &amp; u \end{bmatrix}, \;\; \left [ B \right ] = \begin{bmatrix} 0 &amp; 0 &amp; \frac{1}{\beta} \\ 0 &amp; v &amp; u\\ 1 &amp; 0 &amp; 2v \end{bmatrix}\end{split}\]</div>
+<p>The resolved Eigen values of <span class="math">\(\left [ A \right ]\)</span> and <span class="math">\(\left [ B \right ]\)</span> matrices are <span class="math">\(u, u+a, u-a\)</span> and <span class="math">\(v, v+a, v-a\)</span>, respectively. Taking <span class="math">\(\left [ A \right ]\)</span> for example, the maximum convection velocity that transmit the numerical information can then be <span class="math">\(\left | u  \right | + a\)</span>. Therefore, the Courant number for this case can also be determined by:</p>
+<div class="math">
+\[C = \frac{|u_{x}| + a}{\Delta x} + \frac{|u_{y}| + a}{\Delta y}\]</div>
+</li>
+</ul>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../Theory/formulations/contents.html"
+                        title="previous chapter">Formulations</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../Setup/contents.html"
+                        title="next chapter">Setup</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../_sources/Numerical/contents.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../Setup/contents.html" title="Setup"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../Theory/formulations/contents.html" title="Formulations"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../index.html">Final Project 0.0.1 documentation</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Sayop Kim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
