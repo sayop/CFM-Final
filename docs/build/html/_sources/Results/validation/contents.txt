@@ -20,6 +20,3 @@ For this project, the Python script is newly created indepedent of the previous 
 .. image:: ./images/v-velocity_in_x.png
    :align: center
    :width: 40%
-
-
-The RMS error obtained from the steady solution as compared to the reference data is 0.29% with convergence criteria set to 0.01%.
