@@ -1,0 +1,139 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+  "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+    
+    <title>Reacting case (Re=100) &mdash; Final Project 0.0.1 documentation</title>
+    
+    <link rel="stylesheet" href="../../_static/classic.css" type="text/css" />
+    <link rel="stylesheet" href="../../_static/pygments.css" type="text/css" />
+    
+    <script type="text/javascript">
+      var DOCUMENTATION_OPTIONS = {
+        URL_ROOT:    '../../',
+        VERSION:     '0.0.1',
+        COLLAPSE_INDEX: false,
+        FILE_SUFFIX: '.html',
+        HAS_SOURCE:  true
+      };
+    </script>
+    <script type="text/javascript" src="../../_static/jquery.js"></script>
+    <script type="text/javascript" src="../../_static/underscore.js"></script>
+    <script type="text/javascript" src="../../_static/doctools.js"></script>
+    <script type="text/javascript" src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML"></script>
+    <link rel="top" title="Final Project 0.0.1 documentation" href="../../index.html" />
+    <link rel="up" title="Results" href="../index.html" />
+    <link rel="next" title="Reacting case (High Re number)" href="../Re200-400/contents.html" />
+    <link rel="prev" title="Discussion on non-reacting flow field / mixture fraction" href="../flow/contents.html" /> 
+  </head>
+  <body role="document">
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             accesskey="I">index</a></li>
+        <li class="right" >
+          <a href="../Re200-400/contents.html" title="Reacting case (High Re number)"
+             accesskey="N">next</a> |</li>
+        <li class="right" >
+          <a href="../flow/contents.html" title="Discussion on non-reacting flow field / mixture fraction"
+             accesskey="P">previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Final Project 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" accesskey="U">Results</a> &raquo;</li> 
+      </ul>
+    </div>  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          <div class="body" role="main">
+            
+  <div class="section" id="reacting-case-re-100">
+<h1>Reacting case (Re=100)<a class="headerlink" href="#reacting-case-re-100" title="Permalink to this headline">¶</a></h1>
+<p>In this section, a simulation with consideratino of infinitely fast chemistry is introduced. The following two snapshots illustrate the flow feature and temperature distribution in space. Note that for some reason the image is flipped from the original position of the domain. So the fuel stream seems to be issued from the right inlet and the resulting streamlines go down and exit the domain. As already illustrated in the non-reacting case, the velocity contour is formed symetrically. The reacting case simulation enables to predict high temperature region near at the center position but slightly shifted to the oxidizer stream. This very well-known feature of typical diffusion flame because the diffusion flame is positioned at stoichiometric condition. Note that the stoichiometric mixture fraction is around 0.05 under this condition.</p>
+<ul class="simple">
+<li><strong>Velocity and temperature contour</strong></li>
+</ul>
+<a class="reference internal image-reference" href="../../_images/combinedUT.png"><img alt="../../_images/combinedUT.png" class="align-center" src="../../_images/combinedUT.png" style="width: 60%;" /></a>
+<p>As identically to the non-reacting case, the velocity distribution is formed perfectly symmetry but by the opposite sign from each other&#8217;s stream. The stagnation point is exactly located at x=0 position.</p>
+<a class="reference internal image-reference" href="../../_images/uVel.png"><img alt="../../_images/uVel.png" class="align-center" src="../../_images/uVel.png" style="width: 40%;" /></a>
+<ul>
+<li><p class="first"><strong>Mass fraction contour of fuel and oxidizer</strong></p>
+<p>These images illustrate the formation of fuel and oxidizer in their mass fraction. Note that inlet condition of oxidizer is much leaner than the fuel stream: <span class="math">\(Y_{O}^{0} = 0.233\)</span>, which is overall unity equivalence ratio.</p>
+</li>
+</ul>
+<a class="reference internal image-reference" href="../../_images/combinedMFR.png"><img alt="../../_images/combinedMFR.png" class="align-center" src="../../_images/combinedMFR.png" style="width: 60%;" /></a>
+<p>The figures shown below are outcomes of competition between mixture formation and chemical reaction. As compared to the non-reacting case, the fuel and oxidizer does not co-exist because of infinitely fast chemistry assumption. And the maximum temperature peak is positioned at the location where those two massfraction goes to zero. It means that complete combustion results in maximum flame temperature at the stoichiometry condition. The noticeable reaction zone is anchored over about 0.05 mm length in x direction when it is drawn along the centerline axis.</p>
+<p>The following second figure was capture downstream at y = 0.2 m. Because of the flow development and diffusion process, the mixture fraction field is no more sharp and thus the flame thickness become bigger than at the centerline axis.</p>
+<ul class="simple">
+<li><strong>Flame structure at y = 0 m</strong></li>
+</ul>
+<a class="reference internal image-reference" href="../../_images/flameField_0.png"><img alt="../../_images/flameField_0.png" class="align-center" src="../../_images/flameField_0.png" style="width: 50%;" /></a>
+<ul class="simple">
+<li><strong>Flame structure at y = 0.2 m</strong></li>
+</ul>
+<a class="reference internal image-reference" href="../../_images/flameField_4.png"><img alt="../../_images/flameField_4.png" class="align-center" src="../../_images/flameField_4.png" style="width: 50%;" /></a>
+</div>
+
+
+          </div>
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+  <h4>Previous topic</h4>
+  <p class="topless"><a href="../flow/contents.html"
+                        title="previous chapter">Discussion on non-reacting flow field / mixture fraction</a></p>
+  <h4>Next topic</h4>
+  <p class="topless"><a href="../Re200-400/contents.html"
+                        title="next chapter">Reacting case (High Re number)</a></p>
+  <div role="note" aria-label="source link">
+    <h3>This Page</h3>
+    <ul class="this-page-menu">
+      <li><a href="../../_sources/Results/Re100/contents.txt"
+            rel="nofollow">Show Source</a></li>
+    </ul>
+   </div>
+<div id="searchbox" style="display: none" role="search">
+  <h3>Quick search</h3>
+    <form class="search" action="../../search.html" method="get">
+      <input type="text" name="q" />
+      <input type="submit" value="Go" />
+      <input type="hidden" name="check_keywords" value="yes" />
+      <input type="hidden" name="area" value="default" />
+    </form>
+    <p class="searchtip" style="font-size: 90%">
+    Enter search terms or a module, class or function name.
+    </p>
+</div>
+<script type="text/javascript">$('#searchbox').show(0);</script>
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="related" role="navigation" aria-label="related navigation">
+      <h3>Navigation</h3>
+      <ul>
+        <li class="right" style="margin-right: 10px">
+          <a href="../../genindex.html" title="General Index"
+             >index</a></li>
+        <li class="right" >
+          <a href="../Re200-400/contents.html" title="Reacting case (High Re number)"
+             >next</a> |</li>
+        <li class="right" >
+          <a href="../flow/contents.html" title="Discussion on non-reacting flow field / mixture fraction"
+             >previous</a> |</li>
+        <li class="nav-item nav-item-0"><a href="../../index.html">Final Project 0.0.1 documentation</a> &raquo;</li>
+          <li class="nav-item nav-item-1"><a href="../index.html" >Results</a> &raquo;</li> 
+      </ul>
+    </div>
+    <div class="footer" role="contentinfo">
+        &copy; Copyright 2016, Sayop Kim.
+      Created using <a href="http://sphinx-doc.org/">Sphinx</a> 1.3.1.
+    </div>
+  </body>
+</html>
