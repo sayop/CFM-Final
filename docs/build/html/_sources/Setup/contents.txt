@@ -15,7 +15,7 @@ Grid resolution is set to 150x300 in x and y direction, respectively.
 
 .. image:: ./images/domain.png
    :align: center
-   :width: 40%
+   :width: 60%
 
 
 --------------------

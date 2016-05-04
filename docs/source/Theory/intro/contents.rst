@@ -8,7 +8,7 @@ The figure shown below illustrates a simplified configuratoin of diffusion flame
 
 .. image:: ./images/diffusionFlame.png
    :align: center
-   :width: 60%
+   :width: 80%
 
 
 To simplify the theoretical analsys in the diffusion flame, many studies idealized situations of this type of flame introducing the passive scalar concept that is mathmatically manipulated variables from the physical properties of mixture. To introduce the passive scalar, several idealized assumptions need to be introduced and stated as listed below:
@@ -23,6 +23,6 @@ In this project, a planar counterflow diffusion flame is employed to discuss. Co
 
 .. image:: ./images/counterflow.png
    :align: center
-   :width: 40%
+   :width: 60%
 
 
